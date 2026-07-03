@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backup-service:
+    build: .
+    container_name: docker-rsync-scheduler
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Warsaw
+    volumes:
+      # Stałe mapowanie dla konfiguracji i logów aplikacji
+      - ./config:/app/config
+      - ./logs:/app/logs
+      
+      # ==========================================
+      # 1. PRZYKŁAD DLA WINDOWS
+      # ==========================================
+      # Docker na Windows obsługuje ukośniki w prawo lub lewo. 
+      # Ważne: Jeśli ścieżka ma spacje, całe mapowanie dajemy w cudzysłów.
+      # :ro oznacza Read-Only (bezpieczny odczyt bez ryzyka skasowania źródła)
+      - "C:/Users/Jan/Documents:/source/windows_docs:ro"
+      - "D:/Backup/Dane:/dest/windows_backup"
+
+      # ==========================================
+      # 2. PRZYKŁAD DLA LINUX
+      # ==========================================
+      # Standardowe, klasyczne ścieżki absolutne.
+      - /home/jan/obrazy:/source/linux_images:ro
+      - /media/dysk_zewnetrzny/backup:/dest/linux_backup
+
+      # ==========================================
+      # 3. PRZYKŁAD DLA NAS (np. Synology / QNAP)
+      # ==========================================
+      # NAS to też Linux. W Synology udziały sieciowe są zazwyczaj w /volume1.
+      # W QNAP często zaczynają się od /share/CACHEDEV1_DATA/.
+      - /volume1/homes/admin/documents:/source/nas_docs:ro
+      - /volume1/NetBackup/rsync_dest:/dest/nas_backup
+
+      # ==========================================
+      # 4. PRZYKŁAD DLA MacOS
+      # ==========================================
+      # macOS bazuje na Unixie, więc ścieżki wyglądają jak w Linuxie.
+      # Główny dysk użytkownika znajduje się w katalogu /Users/.
+      # Dyski zewnętrzne/sieciowe montują się w katalogu /Volumes/.
+      - /Users/jan/Projects:/source/mac_projects:ro
+      - /Volumes/SeagateBackup/docker_dest:/dest/mac_backup

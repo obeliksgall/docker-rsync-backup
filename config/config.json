@@ -1,0 +1,35 @@
+{
+  "general": {
+    "discord_webhook_url": "TUTAJ_WKLEJ_SWOJ_WEBHOOK_DISCORD",
+    "notification_level": "all",
+    "config_check_interval_seconds": 10,
+    "default_scheduler": "0 2 * * *",
+    "max_concurrent_tasks": 1
+  },
+  "tasks": [
+    {
+      "name": "Backup Dokumentow",
+      "enabled": true,
+      "type": "incremental",
+      "source": "/source/documents",
+      "dest": "/dest/backup_documents",
+      "scheduler": "*/5 * * * *",
+      "exclude": [
+        "@Recycle",
+        "@eaDir",
+        ".DS_Store",
+        "/2026/banan.docx"
+      ],
+      "extra_rsync_flags": ""
+    },
+    {
+      "name": "Backup z Windowsa",
+      "enabled": true,
+      "type": "incremental",
+      "source": "/source/windows_docs",
+      "dest": "/dest/windows_backup",
+      "scheduler": "*/5 * * * *",
+      "exclude": []
+    }
+  ]
+}
