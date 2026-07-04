@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "BackupServiceConfig",
+  "type": "object",
+  "required": [
+    "general",
+    "tasks"
+  ],
+  "properties": {
+    "general": {
+      "type": "object",
+      "required": [
+        "discord_webhook_url",
+        "notification_level",
+        "config_check_interval_seconds",
+        "default_scheduler",
+        "max_concurrent_tasks"
+      ],
+      "properties": {
+        "discord_webhook_url": {
+          "type": "string",
+          "description": "Pełny adres URL webhooka Discord do wysyłania powiadomień."
+        },
+        "notification_level": {
+          "type": "string",
+          "enum": [
+            "all",
+            "errors_only",
+            "none"
+          ],
+          "description": "Poziom raportowania na Discordzie: all (wszystko), errors_only (tylko błędy), none (brak)."
+        },
+        "config_check_interval_seconds": {
+          "type": "integer",
+          "minimum": 5,
+          "description": "Co ile sekund aplikacja ma sprawdzać zmiany w pliku config.json."
+        },
+        "default_scheduler": {
+          "type": "string",
+          "pattern": "^([^\\s]+\\s+){4}[^\\s]+$",
+          "description": "Domyślny harmonogram w formacie Cron (5 kolumn, np. '0 2 * * *'), używany gdy zadanie nie ma własnego."
+        },
+        "max_concurrent_tasks": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maksymalna liczba zadań wykonywanych jednocześnie. Ustawienie 1 wymusza tryb sekwencyjny (jedno po drugim)."
+        }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "description": "Lista zdefiniowanych zadań backupowych.",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "enabled",
+          "type",
+          "source",
+          "dest"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unikalna nazwa zadania (służy też jako identyfikator blokady i pliku logów)."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Czy zadanie jest aktywne. Jeśli false, scheduler całkowicie je zignoruje."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "mirror",
+              "incremental",
+              "move"
+            ],
+            "description": "Typ operacji: mirror (kopia 1:1 z usuwaniem w celu), incremental (przyrostowo bez usuwania), move (przenoszenie)."
+          },
+          "source": {
+            "type": "string",
+            "description": "Ścieżka źródłowa wewnątrz kontenera (np. /source/documents)."
+          },
+          "dest": {
+            "type": "string",
+            "description": "Ścieżka docelowa wewnątrz kontenera (np. /dest/backup_documents)."
+          },
+          "scheduler": {
+            "type": "string",
+            "pattern": "^([^\\s]+\\s+){4}[^\\s]+$",
+            "description": "Opcjonalny, dedykowany harmonogram Cron dla tego zadania. Nadpisuje default_scheduler."
+          },
+          "exclude": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Lista wykluczonych plików lub katalogów (np. '@Recycle', '/2026/banan.docx')."
+          },
+          "extra_rsync_flags": {
+            "type": "string",
+            "description": "Dodatkowe, opcjonalne flagi przekazywane bezpośrednio do rsync (np. '--bwlimit=5000')."
+          }
+        }
+      }
+    }
+  }
+}
